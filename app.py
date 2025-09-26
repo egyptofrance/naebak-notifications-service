@@ -1,57 +1,148 @@
 """
-Naebak Notifications Service - Multi-channel Notification System
+Naebak Notifications Service - Main Application
 
-This is the main application file for the Naebak Notifications Service, which provides
-comprehensive notification delivery across multiple channels including email, SMS, and
-push notifications. The service handles notification queuing, processing, and delivery
-for all platform communications including user alerts, system notifications, and
-political engagement updates.
+This is the main Flask application for the Naebak notifications service,
+providing comprehensive notification management capabilities including
+multi-channel delivery, template management, user preferences, and
+real-time notification processing.
 
 Key Features:
-- Multi-channel notification delivery (email, SMS, push)
-- Redis-based notification queuing for reliability
-- Asynchronous notification processing
-- Template-based notification content
-- Delivery status tracking and retry mechanisms
-- Integration with external notification providers
-
-Architecture:
-The service implements a queue-based notification system using Redis for message
-persistence and delivery coordination. It supports both immediate and scheduled
-notifications while providing delivery confirmation and error handling.
+- RESTful API for notification management
+- Multi-channel notification delivery (Email, SMS, Push, In-App)
+- Template-based notification content with Arabic support
+- User preference management and quiet hours
+- Asynchronous processing with Celery
+- Real-time delivery status tracking
+- Comprehensive error handling and logging
+- Integration with other Naebak services
 """
 
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import redis
-import json
-from datetime import datetime
+import os
 import logging
+from datetime import datetime, timedelta
+from typing import Dict, Any, List, Optional
+from flask import Flask, request, jsonify, g
+from flask_cors import CORS
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import and_, or_
+import redis
+import jwt
+
+# Internal imports
+from models import (
+    Notification, NotificationTemplate, UserNotificationPreference,
+    NotificationStatus, NotificationChannel, NotificationType, NotificationPriority,
+    init_database
+)
+from delivery_channels import create_delivery_manager
+from template_system import create_template_manager, create_preference_manager
+from celery_tasks import (
+    send_notification, send_batch_notifications, send_welcome_notification,
+    celery_app
+)
 from config import get_config
 
-# Setup application
-app = Flask(__name__)
-config = get_config()
-app.config.from_object(config)
-
-# Setup CORS
-CORS(app, origins=app.config["CORS_ALLOWED_ORIGINS"])
-
-# Setup Redis for notification queue
-try:
-    redis_client = redis.from_url(app.config["REDIS_URL"])
-    redis_client.ping()
-    print("Connected to Redis for notifications queue successfully!")
-except redis.exceptions.ConnectionError as e:
-    print(f"Could not connect to Redis for notifications queue: {e}")
-    redis_client = None
-
-# Setup Logging
+# Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Get configuration
+config = get_config()
+
+# Initialize Flask app
+app = Flask(__name__)
+app.config.from_object(config)
+
+# Enable CORS
+CORS(app, origins=config.ALLOWED_ORIGINS)
+
+# Initialize database
+engine, SessionLocal = init_database(config.DATABASE_URL)
+
+# Initialize Redis for caching and real-time features
+redis_client = redis.Redis.from_url(config.REDIS_URL, decode_responses=True)
+
+# Initialize delivery manager
+delivery_config = {
+    'email': {
+        'api_key': config.SENDGRID_API_KEY,
+        'from_email': config.FROM_EMAIL,
+        'from_name': config.FROM_NAME,
+        'reply_to': config.REPLY_TO_EMAIL
+    },
+    'sms': {
+        'account_sid': config.TWILIO_ACCOUNT_SID,
+        'auth_token': config.TWILIO_AUTH_TOKEN,
+        'from_number': config.TWILIO_FROM_NUMBER,
+        'webhook_url': config.TWILIO_WEBHOOK_URL
+    },
+    'push': {
+        'api_key': config.FCM_API_KEY,
+        'project_id': config.FCM_PROJECT_ID,
+        'default_icon': config.FCM_DEFAULT_ICON,
+        'default_sound': config.FCM_DEFAULT_SOUND
+    },
+    'in_app': {
+        'redis_client': redis_client,
+        'websocket_url': config.WEBSOCKET_URL
+    }
+}
+
+delivery_manager = create_delivery_manager(delivery_config)
+
+# Database session management
+@app.before_request
+def before_request():
+    """Create database session for each request."""
+    g.db_session = SessionLocal()
+
+@app.teardown_appcontext
+def close_db_session(error):
+    """Close database session after each request."""
+    if hasattr(g, 'db_session'):
+        g.db_session.close()
+
+# Authentication middleware
+def verify_jwt_token(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Verify JWT token and extract user information.
+    
+    Args:
+        token (str): JWT token to verify
+        
+    Returns:
+        dict: User information or None if invalid
+    """
+    try:
+        payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=['HS256'])
+        return payload
+    except jwt.ExpiredSignatureError:
+        logger.warning("JWT token has expired")
+        return None
+    except jwt.InvalidTokenError:
+        logger.warning("Invalid JWT token")
+        return None
+
+def require_auth(f):
+    """Decorator to require authentication for endpoints."""
+    def decorated_function(*args, **kwargs):
+        auth_header = request.headers.get('Authorization')
+        if not auth_header or not auth_header.startswith('Bearer '):
+            return jsonify({'error': 'Missing or invalid authorization header'}), 401
+        
+        token = auth_header.split(' ')[1]
+        user_info = verify_jwt_token(token)
+        if not user_info:
+            return jsonify({'error': 'Invalid or expired token'}), 401
+        
+        g.current_user = user_info
+        return f(*args, **kwargs)
+    
+    decorated_function.__name__ = f.__name__
+    return decorated_function
 
 class Notification:
     """
