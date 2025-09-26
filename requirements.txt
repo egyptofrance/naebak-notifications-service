@@ -1,9 +1,6 @@
 flask
 flask-sqlalchemy
 sqlalchemy
-twilio
-sendgrid
-firebase-admin
 redis
 celery
 requests

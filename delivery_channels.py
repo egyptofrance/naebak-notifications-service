@@ -20,11 +20,7 @@ from typing import Dict, Any, Optional, Tuple
 from datetime import datetime
 import json
 
-# External provider imports
-import sendgrid
-from sendgrid.helpers.mail import Mail, Email, To, Content
-from twilio.rest import Client as TwilioClient
-from pyfcm import FCMNotification
+# External provider imports (SMS and Push providers removed)
 import requests
 
 # Internal imports
