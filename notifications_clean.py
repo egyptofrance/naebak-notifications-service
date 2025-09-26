@@ -249,7 +249,7 @@ def health_check():
         'timestamp': datetime.datetime.utcnow().isoformat()
     })
 
-@app.route('/send', methods=['POST'])
+@app.route('/api/send', methods=['POST'])
 def send_notification():
     """Send notification endpoint"""
     try:
@@ -269,7 +269,7 @@ def send_notification():
         logger.error(f"Error in send_notification: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/notifications/<user_id>', methods=['GET'])
+@app.route('/api/notifications/<user_id>', methods=['GET'])
 def get_user_notifications(user_id):
     """Get notifications for a user"""
     try:
@@ -293,7 +293,7 @@ def get_user_notifications(user_id):
         logger.error(f"Error getting notifications for user {user_id}: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
-@app.route('/channels', methods=['GET'])
+@app.route('/api/channels', methods=['GET'])
 def get_available_channels():
     """Get available notification channels"""
     return jsonify({
