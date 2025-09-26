@@ -1,0 +1,24 @@
+2025-09-26 04:53:57,288 - INFO - 🌐 Starting Naebak Notifications Service Tests
+2025-09-26 04:53:57,288 - INFO - ============================================================
+2025-09-26 04:53:57,288 - WARNING - ⚠️  File Structure: Missing files: ['notifications.py', 'constants.py', 'routing_system.py', 'security_middleware.py']. Present: ['app.py', 'config.py', 'requirements.txt']
+2025-09-26 04:53:57,313 - INFO - ✅ Python Syntax: All 8 Python files have valid syntax
+2025-09-26 04:53:57,400 - INFO - ✅ Flask Dependencies: All key dependencies available: 3 modules
+2025-09-26 04:53:57,401 - INFO - ✅ Gateway Configuration: Configuration elements found: ['Config class defined', 'Secret key configuration', 'Database configuration', 'Host/Port configuration', 'Debug configuration']
+2025-09-26 04:53:57,401 - ERROR - ❌ Routing System: routing_system.py not found
+2025-09-26 04:53:57,401 - ERROR - ❌ Security Middleware: security_middleware.py not found
+2025-09-26 04:53:57,401 - ERROR - ❌ Main Gateway App: notifications.py not found
+2025-09-26 04:53:57,401 - INFO - ✅ Startup Script: Startup features: ['Main execution block', 'Gateway import', 'App execution', 'Host/Port configuration']
+2025-09-26 04:53:57,403 - WARNING - ⚠️  Code Quality: Quality score: 62.0%. Metrics: {'total_lines': 3026, 'python_files': 6, 'docstrings': 197, 'comments': 166, 'functions': 85, 'classes': 24}
+2025-09-26 04:53:57,403 - INFO - ============================================================
+2025-09-26 04:53:57,403 - INFO - 📋 GATEWAY SERVICE TEST SUMMARY
+2025-09-26 04:53:57,403 - INFO - ============================================================
+2025-09-26 04:53:57,403 - INFO - 🌐 Service: naebak-notifications-service
+2025-09-26 04:53:57,403 - INFO - 📅 Timestamp: 2025-09-26T04:53:57.288395
+2025-09-26 04:53:57,403 - INFO - 📊 Total Tests: 9
+2025-09-26 04:53:57,403 - INFO - ✅ Passed: 4
+2025-09-26 04:53:57,403 - INFO - ❌ Failed: 3
+2025-09-26 04:53:57,404 - INFO - 📈 Success Rate: 44.4%
+2025-09-26 04:53:57,404 - INFO - 🎯 Service Status: FAILED
+2025-09-26 04:53:57,404 - INFO - 📄 Detailed results saved to /home/ubuntu/naebak-notifications-service/tests/test_results.json
+2025-09-26 04:53:57,404 - INFO - 📋 Summary report saved to /home/ubuntu/naebak-notifications-service/tests/test_summary.md
+2025-09-26 04:53:57,404 - INFO - ============================================================

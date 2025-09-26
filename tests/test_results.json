@@ -1,0 +1,73 @@
+{
+  "service_name": "naebak-notifications-service",
+  "test_timestamp": "2025-09-26T04:53:57.288395",
+  "tests_run": 9,
+  "tests_passed": 4,
+  "tests_failed": 3,
+  "test_details": [
+    {
+      "test_name": "File Structure",
+      "status": "WARNING",
+      "details": "Missing files: ['notifications.py', 'constants.py', 'routing_system.py', 'security_middleware.py']. Present: ['app.py', 'config.py', 'requirements.txt']",
+      "duration_ms": 0.05,
+      "timestamp": "2025-09-26T04:53:57.288674"
+    },
+    {
+      "test_name": "Python Syntax",
+      "status": "PASSED",
+      "details": "All 8 Python files have valid syntax",
+      "duration_ms": 24.95,
+      "timestamp": "2025-09-26T04:53:57.313705"
+    },
+    {
+      "test_name": "Flask Dependencies",
+      "status": "PASSED",
+      "details": "All key dependencies available: 3 modules",
+      "duration_ms": 86.88,
+      "timestamp": "2025-09-26T04:53:57.400788"
+    },
+    {
+      "test_name": "Gateway Configuration",
+      "status": "PASSED",
+      "details": "Configuration elements found: ['Config class defined', 'Secret key configuration', 'Database configuration', 'Host/Port configuration', 'Debug configuration']",
+      "duration_ms": 0.07,
+      "timestamp": "2025-09-26T04:53:57.401029"
+    },
+    {
+      "test_name": "Routing System",
+      "status": "FAILED",
+      "details": "routing_system.py not found",
+      "duration_ms": 0,
+      "timestamp": "2025-09-26T04:53:57.401116"
+    },
+    {
+      "test_name": "Security Middleware",
+      "status": "FAILED",
+      "details": "security_middleware.py not found",
+      "duration_ms": 0,
+      "timestamp": "2025-09-26T04:53:57.401182"
+    },
+    {
+      "test_name": "Main Gateway App",
+      "status": "FAILED",
+      "details": "notifications.py not found",
+      "duration_ms": 0,
+      "timestamp": "2025-09-26T04:53:57.401250"
+    },
+    {
+      "test_name": "Startup Script",
+      "status": "PASSED",
+      "details": "Startup features: ['Main execution block', 'Gateway import', 'App execution', 'Host/Port configuration']",
+      "duration_ms": 0.12,
+      "timestamp": "2025-09-26T04:53:57.401409"
+    },
+    {
+      "test_name": "Code Quality",
+      "status": "WARNING",
+      "details": "Quality score: 62.0%. Metrics: {'total_lines': 3026, 'python_files': 6, 'docstrings': 197, 'comments': 166, 'functions': 85, 'classes': 24}",
+      "duration_ms": 2.18,
+      "timestamp": "2025-09-26T04:53:57.403653"
+    }
+  ],
+  "service_status": "FAILED"
+}
